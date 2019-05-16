@@ -1,0 +1,152 @@
+{
+  "expectedArtifacts": [
+    {
+      "defaultArtifact": {
+        "id": "322b73db-d4be-4071-97b9-6e359ed11b8f",
+        "name": "manifest.yml",
+        "reference": "https://api.github.com/repos/maggieneterval/spinnaker-kubernetes-demo/contents/manifest.yml",
+        "type": "github/file",
+        "version": "master"
+      },
+      "displayName": "tall-stingray-23",
+      "id": "e3a94a28-befb-4ad3-b6b8-bbc55d03667e",
+      "matchArtifact": {
+        "id": "5b4afdb9-b341-4843-844b-734f819e6dbb",
+        "name": "manifest.yml",
+        "type": "github/file"
+      },
+      "useDefaultArtifact": true,
+      "usePriorArtifact": false
+    },
+    {
+      "defaultArtifact": {
+        "id": "012c2ab4-e2e0-46f1-8749-aedc73ea7269",
+        "name": "gcr.io/spinnaker-maggie/spinnaker-kubernetes-demo",
+        "reference": "gcr.io/spinnaker-maggie/spinnaker-kubernetes-demo@sha256:d082a38995e9cd5eb942e20ba831b7dfbc2669cbeca4090cce33abca6fe90794",
+        "type": "docker/image",
+        "version": "sha256:d082a38995e9cd5eb942e20ba831b7dfbc2669cbeca4090cce33abca6fe90794"
+      },
+      "displayName": "chilly-turtle-40",
+      "id": "e909f3f3-1b6a-4289-9f24-a14eacd4324a",
+      "matchArtifact": {
+        "id": "1c12c3c8-ca1c-4c2e-af71-835f8060ee2f",
+        "name": "gcr.io/spinnaker-maggie/spinnaker-kubernetes-demo",
+        "type": "docker/image"
+      },
+      "useDefaultArtifact": true,
+      "usePriorArtifact": false
+    }
+  ],
+  "keepWaitingPipelines": false,
+  "lastModifiedBy": "anonymous",
+  "limitConcurrent": true,
+  "stages": [
+    {
+      "account": "prod-demo",
+      "cloudProvider": "kubernetes",
+      "manifestArtifactAccount": "my-github-artifact-account",
+      "manifestArtifactId": "e3a94a28-befb-4ad3-b6b8-bbc55d03667e",
+      "moniker": {
+        "app": "kubernetes-application"
+      },
+      "name": "Deploy (Manifest)",
+      "refId": "1",
+      "requiredArtifactIds": [
+        "e909f3f3-1b6a-4289-9f24-a14eacd4324a"
+      ],
+      "requiredArtifacts": [],
+      "requisiteStageRefIds": [],
+      "skipExpressionEvaluation": false,
+      "source": "artifact",
+      "trafficManagement": {
+        "enabled": true,
+        "options": {
+          "enableTraffic": false,
+          "namespace": "default",
+          "services": [
+            "service maggie-k8s-demo"
+          ]
+        }
+      },
+      "type": "deployManifest"
+    },
+    {
+      "failPipeline": true,
+      "instructions": "Ensure that new ReplicaSet is ready to take traffic!",
+      "isNew": true,
+      "judgmentInputs": [],
+      "name": "Manual Judgment",
+      "notifications": [],
+      "refId": "2",
+      "requisiteStageRefIds": [
+        "1"
+      ],
+      "type": "manualJudgment"
+    },
+    {
+      "account": "prod-demo",
+      "app": "kubernetes-application",
+      "cloudProvider": "kubernetes",
+      "cluster": "replicaSet maggie-k8s-demo",
+      "criteria": "newest",
+      "isNew": true,
+      "kind": "replicaSet",
+      "kinds": null,
+      "labelSelectors": null,
+      "location": "default",
+      "manifestName": null,
+      "mode": "dynamic",
+      "name": "Enable (Manifest)",
+      "refId": "3",
+      "requisiteStageRefIds": [
+        "2"
+      ],
+      "type": "enableManifest"
+    },
+    {
+      "account": "prod-demo",
+      "app": "kubernetes-application",
+      "cloudProvider": "kubernetes",
+      "cluster": "replicaSet maggie-k8s-demo",
+      "criteria": "second_newest",
+      "isNew": true,
+      "kind": "replicaSet",
+      "kinds": null,
+      "labelSelectors": null,
+      "location": "default",
+      "manifestName": null,
+      "mode": "dynamic",
+      "name": "Disable (Manifest)",
+      "refId": "4",
+      "requisiteStageRefIds": [
+        "3"
+      ],
+      "type": "disableManifest"
+    }
+  ],
+  "triggers": [
+    {
+      "branch": "master",
+      "enabled": true,
+      "expectedArtifactIds": [
+        "e3a94a28-befb-4ad3-b6b8-bbc55d03667e"
+      ],
+      "project": "maggieneterval",
+      "slug": "spinnaker-kubernetes-demo",
+      "source": "github",
+      "type": "git"
+    },
+    {
+      "account": "my-gcr-registry",
+      "enabled": true,
+      "expectedArtifactIds": [
+        "e909f3f3-1b6a-4289-9f24-a14eacd4324a"
+      ],
+      "organization": "spinnaker-maggie",
+      "registry": "gcr.io",
+      "repository": "spinnaker-maggie/spinnaker-kubernetes-demo",
+      "type": "docker"
+    }
+  ],
+  "updateTs": "1558042264061"
+}
